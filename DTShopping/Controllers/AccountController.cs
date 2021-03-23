@@ -69,15 +69,23 @@ namespace DTShopping
         [AllowAnonymous]
         public async Task<ActionResult> LoginApiUser(string data)
         {
+
+            string path = System.Web.HttpContext.Current.Server.MapPath("~/Logs/ErrorLog");
+            if (!Directory.Exists(path))
+            {
+                Directory.CreateDirectory(path);
+            }
+            clsgen.ErrorLog(path, ("SUCCESS-00:" + data));
             try
             {
                 //var dataStr = "GH637158|281614|30|" + DateTime.Now.ToString("dd-MM-yyyy HH:mm:ss", CultureInfo.InvariantCulture);
-               // var d = Encrypt(dataStr, KeyByte, IVByte);
-               //var dataStr = "AT6665090|123123|45|02-12-2020 16:39:20";
-               // string encrypted = Encrypt(dataStr, KeyByte, IVByte);
-               //data = encrypted;
-               var detail = Decrypt(data, KeyByte, IVByte);
-
+                // var d = Encrypt(dataStr, KeyByte, IVByte);
+                //var dataStr = "AT6665090|123123|45|02-12-2020 16:39:20";
+                // string encrypted = Encrypt(dataStr, KeyByte, IVByte);
+                //data = encrypted;
+                clsgen.ErrorLog(path, ("SUCCESS-0:" + data));
+                var detail = Decrypt(data.Replace(" ", "+"), KeyByte, IVByte);
+                clsgen.ErrorLog(path, ("SUCCESS-0.1:" + detail));
 
 
                 // var filename = AppDomain.CurrentDomain.BaseDirectory + "App_Data\\" + "log\\" + "logErrors.txt";
@@ -86,25 +94,24 @@ namespace DTShopping
                 //sw.Close();
                 //var base64EncodedBytes = System.Convert.FromBase64String(data);
                 //var detail = System.Text.Encoding.UTF8.GetString(base64EncodedBytes);
-                string path = System.Web.HttpContext.Current.Server.MapPath("~/Logs/ErrorLog");
-                if (!Directory.Exists(path))
-                {
-                    Directory.CreateDirectory(path);
-                }
+
                 clsgen.ErrorLog(path, ("LoginApiUser:" + detail));
                 if (detail != null && detail.Contains("|"))
                 {
                     var dataArray = detail.Split('|');
-
+                    clsgen.ErrorLog(path, ("SUCCESS-1:" + dataArray));
                     if (dataArray.Length == 4)
                     {
+                        clsgen.ErrorLog(path, ("SUCCESS-2:" + dataArray));
                         //check if request is within 1 min
                         DateTime queryTime = DateTime.ParseExact(dataArray[3], "dd-MM-yyyy HH:mm:ss", CultureInfo.InvariantCulture);
                         var currenttimeStr = DateTime.Now.ToString("dd-MM-yyyy HH:mm:ss", CultureInfo.InvariantCulture);
                         DateTime currentTime = DateTime.ParseExact(currenttimeStr, "dd-MM-yyyy HH:mm:ss", CultureInfo.InvariantCulture);
                         var span = currentTime.Subtract(queryTime);
+                        clsgen.ErrorLog(path, ("SUCCESS-3:" + span));
                         if (span.TotalMinutes <= 1)
                         {
+                            clsgen.ErrorLog(path, ("SUCCESS-4:" + span.TotalMinutes));
                             var userDetail = new UserDetails();
                             userDetail.username = dataArray[0];
                             userDetail.passwordDetail = dataArray[1];
@@ -121,6 +128,7 @@ namespace DTShopping
                             {
                                 if (result.Status == true)
                                 {
+                                    clsgen.ErrorLog(path, ("SUCCESS-5:" + JsonConvert.SerializeObject(result)));
                                     UserDetails user = JsonConvert.DeserializeObject<UserDetails>(result.ResponseValue);
                                     FormsAuthentication.SetAuthCookie(user.username, false);
                                     Session["UserDetail"] = user;
@@ -247,8 +255,8 @@ namespace DTShopping
             return Json(Area);
         }
 
- 
-        public async Task<ActionResult> SaveOtherRegister(string mobileNo,string referralid,string name,string address,string statecode, string district, string city, string email, string areacode, string citycode, string districtcode, string panno ,string pinCode)
+
+        public async Task<ActionResult> SaveOtherRegister(string mobileNo, string referralid, string name, string address, string statecode, string district, string city, string email, string areacode, string citycode, string districtcode, string panno, string pinCode)
         {
 
             General clsgen = new General();
@@ -258,55 +266,55 @@ namespace DTShopping
             ApiOtherRegister register = new ApiOtherRegister();
             try
             {
-            register.reqtype = "register";
-            register.username = string.Empty;
-            register.name = name;
-            register.mobile = "0";
-            register.pincode = pinCode;
-            register.referralid = referralid == null ? "" : referralid;
-            register.side = "1";
-            register.fname = string.Empty;
-            register.dob = "08-04-1992";
-            register.ismarried = "Y";
-            register.marriagedate = "08-05-2018";
-            register.address = address;
-            register.statecode = statecode;
-            register.district =district;
-            register.city =city;
-            register.mobl = mobileNo;
-            register.phoneno = "1482220754";
-            register.email = email;
-            register.nominee = "testjfds";
-            register.relation = "dsdd";
-            register.mpasswd = "123456";
-            register.areacode = areacode;
-            register.citycode = citycode;
-            register.districtcode = districtcode;
-            register.frelation = "D/O";
-            register.actype = "CHOOSE Account Type";
-            register.bankcode = "30";
-            register.panno = panno;
-            register.accountno = "123456868";
-            register.ifsc = "PUNB112478";
-            register.branch = "sanganerigate";
-            register.aadharno = "12323434";
-            string output1 = JsonConvert.SerializeObject(register);
-            HttpWebRequest reponse;
-            reponse = clsgen.JSON(output1, "https://cpanel.gohappynetwork.com/DTProcess.aspx");
-            jsonResponse = clsgen.GetResponse(reponse);
+                register.reqtype = "register";
+                register.username = string.Empty;
+                register.name = name;
+                register.mobile = "0";
+                register.pincode = pinCode;
+                register.referralid = referralid == null ? "" : referralid;
+                register.side = "1";
+                register.fname = string.Empty;
+                register.dob = "08-04-1992";
+                register.ismarried = "Y";
+                register.marriagedate = "08-05-2018";
+                register.address = address;
+                register.statecode = statecode;
+                register.district = district;
+                register.city = city;
+                register.mobl = mobileNo;
+                register.phoneno = "1482220754";
+                register.email = email;
+                register.nominee = "testjfds";
+                register.relation = "dsdd";
+                register.mpasswd = "123456";
+                register.areacode = areacode;
+                register.citycode = citycode;
+                register.districtcode = districtcode;
+                register.frelation = "D/O";
+                register.actype = "CHOOSE Account Type";
+                register.bankcode = "30";
+                register.panno = panno;
+                register.accountno = "123456868";
+                register.ifsc = "PUNB112478";
+                register.branch = "sanganerigate";
+                register.aadharno = "12323434";
+                string output1 = JsonConvert.SerializeObject(register);
+                HttpWebRequest reponse;
+                reponse = clsgen.JSON(output1, "https://cpanel.gohappynetwork.com/DTProcess.aspx");
+                jsonResponse = clsgen.GetResponse(reponse);
 
-            ApiPinCoderesponse Code = new ApiPinCoderesponse();
-            {
-                Code.request = output1;
-                Code.response = jsonResponse;
-                Code.url = "https://cpanel.gohappynetwork.com/DTProcess.aspx";
+                ApiPinCoderesponse Code = new ApiPinCoderesponse();
+                {
+                    Code.request = output1;
+                    Code.response = jsonResponse;
+                    Code.url = "https://cpanel.gohappynetwork.com/DTProcess.aspx";
+                }
+                var statusID = await this._APIManager.SaveAPIRequest(Code);
             }
-            var statusID = await this._APIManager.SaveAPIRequest(Code);
-        }
-        catch(Exception ex)
-          {
+            catch (Exception ex)
+            {
 
-          }
+            }
             return Json(jsonResponse);
         }
 
@@ -328,7 +336,7 @@ namespace DTShopping
             return RedirectToAction("Index", "Home");
         }
 
-         private async Task AssignOtherAreaCode(string pinCode)
+        private async Task AssignOtherAreaCode(string pinCode)
         {
             this.model.AreaCoderesponse = await this._APIManager.GetAreaCode(pinCode);
             if (this.model.AreaCoderesponse == null)
